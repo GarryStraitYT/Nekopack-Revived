@@ -10,7 +10,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install Cygwin
-      run: choco install cygwin
+      run: choco install cygwin --params "/InstallDir:C:\cygwin64"
 
     - name: Install MinGW
       run: choco install mingw
