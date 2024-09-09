@@ -1,0 +1,25 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Cygwin
+      run: choco install cygwin
+
+    - name: Install MinGW
+      run: choco install mingw
+
+    - name: Compile with Cygwin
+      run: |
+        C:\cygwin64\bin\bash.exe -c "make clean"
+        C:\cygwin64\bin\bash.exe -c "make"
+    - name: Compile with MinGW
+      run: |
+        C:\MinGW\bin\mingw32-make.exe clean
+        C:\MinGW\bin\mingw32-make.exe
