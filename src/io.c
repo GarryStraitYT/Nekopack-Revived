@@ -122,11 +122,17 @@ void stream_expand(struct stream *s, size_t n) {
     ptrdiff_t dist = (uintptr_t) s->_cur - (uintptr_t) s->_start;
     switch(s->_loc) {
     case HEAP:
-        s->len   += n;
-        s->_start = realloc(s->_start, s->len);
-        s->_cur   = s->_start + dist;
+        s->len += n;
+        void *new_start = realloc(s->_start, s->len);
+        if (new_start == NULL) {
+            // Handle allocation failure
+            return;
+        }
+        s->_start = new_start;
+        s->_cur = (uint8_t *)s->_start + dist;
     }
 }
+
 
 
 /* Concatenates the contents of `src` onto `dst`. */
