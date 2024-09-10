@@ -65,58 +65,34 @@ void make_dirs(const char *path) {
         perror("calloc");
         return;
     }
-
     char *buf_start = buf;
     struct stat tmp;
-
-    // Copy the path to buffer and find the last separator
-    strcpy(buf, path);
-    char *last_sep = strrchr(buf, '/');
-    if (!last_sep) {
-        last_sep = strrchr(buf, '\\');
-    }
-
-    // Null-terminate at the last separator to exclude the file part
-    if (last_sep) {
-        *last_sep = '\0';
-    }
-
-    // Create directories
-    for (int i = 0; buf[i] != '\0'; i++) {
-        if (buf[i] == '/' || buf[i] == '\\') {
-            buf[i] = '\0';
-            if (stat(buf_start, &tmp) == -1) {
-                if (errno == ENOENT) {
-                    if (mkdir(buf_start, 0777) == -1) {
-                        perror("mkdir");
-                        free(buf_start);
-                        return;
-                    }
-                } else {
-                    perror("stat");
+    
+    // Copy the path to buffer and create each directory step-by-step
+    while (*path) {
+        *buf++ = *path++;
+        if (*path == '/' || *path == '\\' || !*path) {
+            *buf = '\0';
+            
+            // Check if the path is already a directory
+            if (stat(buf_start, &tmp) == 0) {
+                if (!S_ISDIR(tmp.st_mode)) {
+                    fprintf(stderr, "%s exists but is not a directory.\n", buf_start);
+                    free(buf_start);
+                    return;  // This is where the program exits if a file exists
+                }
+            } else {
+                // Try to create the directory
+                if (mkdir(buf_start, 0777) && errno != EEXIST) {
+                    perror(buf_start);
                     free(buf_start);
                     return;
                 }
             }
-            buf[i] = (buf[i] == '\0') ? '/' : buf[i];
         }
     }
-
-    // Final directory check
-    if (stat(buf_start, &tmp) == -1) {
-        if (errno == ENOENT) {
-            if (mkdir(buf_start, 0777) == -1) {
-                perror("mkdir");
-            }
-        } else {
-            perror("stat");
-        }
-    }
-
     free(buf_start);
 }
-
-
 /* Joins `name` and the output path specified in `p`. */
 static char *get_path(struct params p, char *name) {
     size_t  name_len = strlen(name);
