@@ -35,8 +35,10 @@
 #ifdef _WIN32
 #include <direct.h>
 #define mkdir(path, mode) _mkdir(path)
+#define PATH_SEPARATOR '\\'
 #else
 #include <unistd.h>
+#define PATH_SEPARATOR '/'
 #endif
 #ifdef __MINGW32__
 #define stat _stat
@@ -58,7 +60,6 @@ static struct stream *load_table(struct stream *s) {
 
 /* Creates any directories that do not already exist in `path`,
    including non-existent parents. */
-
 void make_dirs(const char *path) {
     char *buf = calloc(strlen(path) + 1, 1);
     if (!buf) {
@@ -68,18 +69,17 @@ void make_dirs(const char *path) {
     char *buf_start = buf;
     struct stat tmp;
     
-    // Copy the path to buffer and create each directory step-by-step
     while (*path) {
         *buf++ = *path++;
-        if (*path == '/' || *path == '\\' || !*path) {
+        if (*path == PATH_SEPARATOR || !*path) {
             *buf = '\0';
             
-            // Check if the path is already a directory
+            // Check if it's a file or directory
             if (stat(buf_start, &tmp) == 0) {
                 if (!S_ISDIR(tmp.st_mode)) {
                     fprintf(stderr, "%s exists but is not a directory.\n", buf_start);
                     free(buf_start);
-                    return;  // This is where the program exits if a file exists
+                    return;  // Exit if it's a file
                 }
             } else {
                 // Try to create the directory
