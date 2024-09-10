@@ -10,16 +10,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install Cygwin
-      run: choco install cygwin --params "/InstallDir:C:\cygwin64"
-    - name: Install apt-cyg
-      run: |
-        cd /usr/local/bin
-        wget rawgit.com/transcode-open/apt-cyg/master/apt-cyg
-        install apt-cyg /bin
-
-    - name: Install Cygwin Dependencies (if needed)
-      run: |
-        C:\cygwin64\bin\bash.exe -c "apt-cyg install gcc g++ make"
+      run: choco install cygwin --params "/InstallDir:C:\cygwin64 gcc-core,gcc-g++,make,libiconv"
 
     - name: Compile with Cygwin (make sure paths are correctly handled)
       run: |
