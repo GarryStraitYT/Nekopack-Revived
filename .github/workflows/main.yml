@@ -11,6 +11,11 @@ jobs:
 
     - name: Install Cygwin
       run: choco install cygwin --params "/InstallDir:C:\cygwin64"
+    - name: Install apt-cyg
+      run: |
+        cd /usr/local/bin
+        wget rawgit.com/transcode-open/apt-cyg/master/apt-cyg
+        install apt-cyg /bin
 
     - name: Install Cygwin Dependencies (if needed)
       run: |
