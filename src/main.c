@@ -69,10 +69,22 @@ void make_dirs(const char *path) {
     char *buf_start = buf;
     struct stat tmp;
 
-    for (int i = 0; path[i] != '\0'; i++) {
-        if (path[i] == '/' || path[i] == '\\') {
-            *buf++ = path[i];
-            *buf = '\0';
+    // Copy the path to buffer and find the last separator
+    strcpy(buf, path);
+    char *last_sep = strrchr(buf, '/');
+    if (!last_sep) {
+        last_sep = strrchr(buf, '\\');
+    }
+
+    // Null-terminate at the last separator to exclude the file part
+    if (last_sep) {
+        *last_sep = '\0';
+    }
+
+    // Create directories
+    for (int i = 0; buf[i] != '\0'; i++) {
+        if (buf[i] == '/' || buf[i] == '\\') {
+            buf[i] = '\0';
             if (stat(buf_start, &tmp) == -1) {
                 if (errno == ENOENT) {
                     if (mkdir(buf_start, 0777) == -1) {
@@ -86,8 +98,7 @@ void make_dirs(const char *path) {
                     return;
                 }
             }
-        } else {
-            *buf++ = path[i];
+            buf[i] = (buf[i] == '\0') ? '/' : buf[i];
         }
     }
 
