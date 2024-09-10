@@ -12,19 +12,21 @@ jobs:
     - name: Install Cygwin
       run: choco install cygwin --params "/InstallDir:C:\cygwin64"
 
-    - name: Install MinGW
-      run: choco install mingw
-
-    - name: Compile with Cygwin
+    - name: Install Cygwin Dependencies (if needed)
       run: |
-        C:\cygwin64\bin\bash.exe -c "make clean"
-        C:\cygwin64\bin\bash.exe -c "make"
-  
+        C:\cygwin64\bin\bash.exe -c "apt-cyg install gcc g++ make"
+
+    - name: Compile with Cygwin (make sure paths are correctly handled)
+      run: |
+        C:\cygwin64\bin\bash.exe -c "export PATH=/usr/bin:$PATH && make clean"
+        C:\cygwin64\bin\bash.exe -c "export PATH=/usr/bin:$PATH && make"
+
     - name: Generate Timestamp
       id: generate_timestamp
       run: |
           $timeStamp = Get-Date -Format "yyyyMMdd-HHmmss"
           echo "::set-output name=timestamp::$timeStamp"
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -46,8 +48,3 @@ jobs:
         asset_path: ./bin/nekopack.exe
         asset_name: NekoPackRevived.exe
         asset_content_type: application/octet-stream
-  #  - name: Install tree
-  #    run: choco install tree
-
-  #  - name: List directory tree
-  #    run: tree
