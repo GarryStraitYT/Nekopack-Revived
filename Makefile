@@ -14,7 +14,7 @@ endif
 LDFLAGS = -lz
 LDFLAGS += $(USER_LDFLAGS)
 ifeq ($(shell uname -s),OpenBSD)
-LDFLAGS += -liconv -L/usr/local/lib
+LDFLAGS += -lkernel32 -liconv -L/usr/local/lib
 endif
 
 SRCDIR = src
