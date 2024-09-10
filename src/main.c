@@ -74,8 +74,14 @@ void make_dirs(const char *path) {
             *buf++ = path[i];
             *buf = '\0';
             if (stat(buf_start, &tmp) == -1) {
-                if (mkdir(buf_start, 0777) == -1) {
-                    perror("mkdir");
+                if (errno == ENOENT) {
+                    if (mkdir(buf_start, 0777) == -1) {
+                        perror("mkdir");
+                        free(buf_start);
+                        return;
+                    }
+                } else {
+                    perror("stat");
                     free(buf_start);
                     return;
                 }
@@ -87,8 +93,12 @@ void make_dirs(const char *path) {
 
     // Final directory check
     if (stat(buf_start, &tmp) == -1) {
-        if (mkdir(buf_start, 0777) == -1) {
-            perror("mkdir");
+        if (errno == ENOENT) {
+            if (mkdir(buf_start, 0777) == -1) {
+                perror("mkdir");
+            }
+        } else {
+            perror("stat");
         }
     }
 
