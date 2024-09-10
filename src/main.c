@@ -70,8 +70,8 @@ void make_dirs(const char *path) {
     struct stat tmp;
 
     for (int i = 0; path[i] != '\0'; i++) {
-        if (path[i] == '/') {
-            *buf++ = '/';
+        if (path[i] == '/' || path[i] == '\\') {
+            *buf++ = path[i];
             *buf = '\0';
             if (stat(buf_start, &tmp) == -1) {
                 if (mkdir(buf_start, 0777) == -1) {
@@ -85,7 +85,8 @@ void make_dirs(const char *path) {
         }
     }
 
-    if (stat(buf_start, &tmp) == -1) { // Final directory check
+    // Final directory check
+    if (stat(buf_start, &tmp) == -1) {
         if (mkdir(buf_start, 0777) == -1) {
             perror("mkdir");
         }
